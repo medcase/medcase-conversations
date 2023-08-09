@@ -4,6 +4,10 @@
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "private": true,
+  "publishConfig": {
+	"registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "build": "tsup",
     "lint": "eslint . --fix --max-warnings=0 ",
