@@ -1,11 +1,11 @@
 {
   "name": "@medcase/medcase-conversations",
-  "version": "0.0.1",
+  "version": "0.0.1-test",
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "publishConfig": {
-	"registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "build": "tsup",
