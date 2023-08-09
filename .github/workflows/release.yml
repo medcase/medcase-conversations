@@ -1,4 +1,4 @@
-name: Release Package
+name: Publish Package
 
 on:
   release:
@@ -8,52 +8,30 @@ env:
   MEDCASE_GITHUB_TOKEN: ${{ secrets.MEDCASE_GITHUB_TOKEN }}
   
 jobs:
-  setup:
+  publish-package:
+    name: Publish package
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
-
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.MEDCASE_GITHUB_TOKEN }}
       - name: Setup node
         uses: actions/setup-node@v3
-          
+        with:
+          node-version: 16
       - name: Yarn Cache
-        id: cache
         uses: actions/cache@v2
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies 🔧
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
-  
-  build:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v3
-      - name: Yarn Cache
-        uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
       - name: Build 🏗️
         run: yarn build
 
-  publish-gpr:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          registry-url: https://npm.pkg.github.com/
-      - run: yarn install
-      - run: npm publish
+      - name: Publish packages
+        run: yarn publish
