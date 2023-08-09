@@ -34,4 +34,6 @@ jobs:
         run: yarn build
 
       - name: Publish packages
-        run: yarn publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.MEDCASE_GITHUB_TOKEN }}

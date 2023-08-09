@@ -1,12 +1,13 @@
 {
-  "name": "@medcase/medcase-conversations",
-  "version": "0.0.1-test",
+  "name": "@medcase/conversations",
+  "version": "0.0.1",
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
+  "repository": "git@github.com:medcase/medcase-conversations.git",
   "scripts": {
     "build": "tsup",
     "lint": "eslint . --fix --max-warnings=0 ",
