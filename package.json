@@ -1,6 +1,6 @@
 {
   "name": "@medcase/conversations",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,7 +16,9 @@
   },
   "author": "Medcase",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@twilio/conversations": "^2.4.1"
+  },
   "devDependencies": {
     "@types/node": "^20.4.9",
     "@typescript-eslint/eslint-plugin": "^6.3.0",

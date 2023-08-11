@@ -1,4 +1,3 @@
-//tsup.config.ts
 import { Options } from 'tsup';
 
 const config: Options = {
@@ -6,8 +5,7 @@ const config: Options = {
   clean: true,
   dts: true,
   sourcemap: true,
-  // minify: true,
-  format: ['esm', 'cjs'],
+  format: ['cjs'],
 };
 
 export default config;
