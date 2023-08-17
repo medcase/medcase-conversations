@@ -1,30 +1,43 @@
 import { Client } from '@twilio/conversations';
-import { getMedcaseConversation, onClientEvent, removeClientEventListener } from './functions';
+import {
+  getMedcaseMessages,
+  onClientEvent,
+  onConversationEvent,
+  removeClientEventListener,
+  removeConversationEventListener,
+  sendMedcaseMessage,
+  updateMedcaseToken,
+} from './functions';
 
 /**
- * Initialize medcase conversations
+ * Initialize medcase conversation
  *
  * @param token User access token
+ * @param conversationSid Conversation Sid
  */
 
-const initMedcaseConversations = (token: string) => {
+const initMedcaseConversation = async (token: string, conversationSid: string) => {
   const client = new Client(token);
+  const conversation = await client.getConversationBySid(conversationSid);
 
   return {
     /**
-     * Get a known conversation by its SID.
+     * Send a message to the conversation.
      *
-     * @param conversationSid Conversation sid
+     * @param message Message body for the text message
+     * @return — Index of the new message.
      */
-    getConversation: getMedcaseConversation(client),
+    sendMessage: sendMedcaseMessage(conversation),
     /**
-     * Update the token used by the client and re-register with the Conversations services.
+     * Returns messages from the conversation using the paginator interface.
      *
-     * @param token New access token.
+     * @param pageSize Number of messages to return in a single chunk. Default is 50.
+     * @param anchor Index of the newest message to fetch. Default is from the end.
+     * @param direction Query direction. By default, it queries backwards from newer to older. The "forward" value will query in the opposite direction.
+     * @returns A page of messages.
+     *
      */
-    updateToken: (token: string) => {
-      client.updateToken(token);
-    },
+    getMessages: getMedcaseMessages(conversation),
     /**
      * Add event listener
      *
@@ -32,7 +45,7 @@ const initMedcaseConversations = (token: string) => {
      *
      * @param listener The callback function
      */
-    on: onClientEvent(client),
+    onConversationEvent: onConversationEvent(conversation),
     /**
      * Remove event listener
      *
@@ -40,8 +53,30 @@ const initMedcaseConversations = (token: string) => {
      *
      * @param listener The callback function
      */
-    removeEventListener: removeClientEventListener(client),
+    removeConversationEventListener: removeConversationEventListener(conversation),
+    /**
+     * Add client event listener
+     *
+     * @param eventName The name of the event.
+     *
+     * @param listener The callback function
+     */
+    onClientEvent: onClientEvent(client),
+    /**
+     * Remove client event listener
+     *
+     * @param eventName The name of the event.
+     *
+     * @param listener The callback function
+     */
+    removeClientEventListener: removeClientEventListener(client),
+    /**
+     * Update the token used by the client and re-register with the Conversations services.
+     *
+     * @param token New access token.
+     */
+    updateToken: updateMedcaseToken(client),
   };
 };
 
-export default initMedcaseConversations;
+export default initMedcaseConversation;
