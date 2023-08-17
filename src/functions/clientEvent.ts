@@ -50,14 +50,14 @@ const clientEvent =
     client: Client,
   ): (<K extends keyof ClientEventMap>(event: K, listener: ClientEventMap[K]) => void) => {
     const defaultHandler = (event, listener) =>
-      client[type === 'add' ? 'on' : 'removeListener'](event, listener);
+      client[type === 'add' ? 'addListener' : 'removeListener'](event, listener);
 
     const customHandlers = getCustomHandlers(client)(type);
 
     return (event, listener) => (customHandlers[event] || defaultHandler)(event, listener);
   };
 
-const onClientEvent = clientEvent('add');
+const addClientEventListener = clientEvent('add');
 const removeClientEventListener = clientEvent('remove');
 
-export { onClientEvent, removeClientEventListener };
+export { addClientEventListener, removeClientEventListener };

@@ -1,9 +1,9 @@
 import { Client } from '@twilio/conversations';
 import {
   getMedcaseMessages,
-  onClientEvent,
-  onConversationEvent,
+  addClientEventListener,
   removeClientEventListener,
+  addConversationEventListener,
   removeConversationEventListener,
   sendMedcaseMessage,
   updateMedcaseToken,
@@ -25,7 +25,7 @@ const initMedcaseConversation = async (token: string, conversationSid: string) =
      * Send a message to the conversation.
      *
      * @param message Message body for the text message
-     * @return — Index of the new message.
+     * @return Index of the new message.
      */
     sendMessage: sendMedcaseMessage(conversation),
     /**
@@ -39,15 +39,15 @@ const initMedcaseConversation = async (token: string, conversationSid: string) =
      */
     getMessages: getMedcaseMessages(conversation),
     /**
-     * Add event listener
+     * Add conversation event listener
      *
      * @param eventName The name of the event.
      *
      * @param listener The callback function
      */
-    onConversationEvent: onConversationEvent(conversation),
+    addConversationEventListener: addConversationEventListener(conversation),
     /**
-     * Remove event listener
+     * Remove conversation event listener
      *
      * @param eventName The name of the event.
      *
@@ -61,7 +61,7 @@ const initMedcaseConversation = async (token: string, conversationSid: string) =
      *
      * @param listener The callback function
      */
-    onClientEvent: onClientEvent(client),
+    addClientEventListener: addClientEventListener(client),
     /**
      * Remove client event listener
      *

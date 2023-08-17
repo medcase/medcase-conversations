@@ -37,14 +37,14 @@ const conversationEvent =
     listener: ConversationEventMap[K],
   ) => void) => {
     const defaultHandler = (event, listener) =>
-      conversation[type === 'add' ? 'on' : 'removeListener'](event, listener);
+      conversation[type === 'add' ? 'addListener' : 'removeListener'](event, listener);
 
     const customHandlers = getCustomHandlers(conversation)(type);
 
     return (event, listener) => (customHandlers[event] || defaultHandler)(event, listener);
   };
 
-const onConversationEvent = conversationEvent('add');
+const addConversationEventListener = conversationEvent('add');
 const removeConversationEventListener = conversationEvent('remove');
 
-export { onConversationEvent, removeConversationEventListener };
+export { addConversationEventListener, removeConversationEventListener };
