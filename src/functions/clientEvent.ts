@@ -1,41 +1,12 @@
-import { Client, State, ConnectionState } from '@twilio/conversations';
-import { CustomMessage } from '../types';
+import { Client } from '@twilio/conversations';
 import { convertMessageClass } from '../utils';
-
-type ConnectionError = {
-  terminal: boolean;
-  message: string;
-};
-
-const ClientEventType = {
-  CONNECTION_STATE_CHANGED: 'connectionStateChanged',
-  MESSAGE_ADDED: 'messageAdded',
-  STATE_CHANGED: 'stateChanged',
-  INITIALIZED: 'initialized',
-  INIT_FAILED: 'initFailed',
-  CONNECTION_ERROR: 'connectionError',
-  TOKEN_ABOUT_TO_EXPIRE: 'tokenAboutToExpire',
-  TOKEN_EXPIRED: 'tokenExpired',
-} as const;
-
-export interface ClientEventMap {
-  [ClientEventType.CONNECTION_STATE_CHANGED]: (state: ConnectionState) => void;
-  [ClientEventType.MESSAGE_ADDED]: (message: CustomMessage) => void;
-  [ClientEventType.STATE_CHANGED]: (state: State) => void;
-  [ClientEventType.INITIALIZED]: () => void;
-  [ClientEventType.INIT_FAILED]: ({ error }: { error?: ConnectionError }) => void;
-  [ClientEventType.CONNECTION_ERROR]: (data: ConnectionError) => void;
-  [ClientEventType.TOKEN_ABOUT_TO_EXPIRE]: () => void;
-  [ClientEventType.TOKEN_EXPIRED]: () => void;
-}
-
-type EventHandler<K extends keyof ClientEventMap> = (event: K, listener: ClientEventMap[K]) => void;
+import { ClientEventMap, ClientEventType, EventHandler } from '../types';
 
 const getCustomHandlers = (client: Client) => (type: 'add' | 'remove') => {
-  const clientFunction = client[type === 'add' ? 'on' : 'removeListener'];
+  const clientFunction = client[type === 'add' ? 'addListener' : 'removeListener'];
 
   const handlers: {
-    [K in keyof ClientEventMap]?: EventHandler<K>;
+    [K in keyof ClientEventMap]?: EventHandler<ClientEventMap, K>;
   } = {
     [ClientEventType.MESSAGE_ADDED]: (event, listener) =>
       clientFunction(event, (payload) => listener(convertMessageClass(payload))),
@@ -59,5 +30,7 @@ const clientEvent =
 
 const addClientEventListener = clientEvent('add');
 const removeClientEventListener = clientEvent('remove');
+const removeAllClientEventListeners = (client: Client) => (eventName: string) => () =>
+  client.removeAllListeners(eventName);
 
-export { addClientEventListener, removeClientEventListener };
+export { addClientEventListener, removeClientEventListener, removeAllClientEventListeners };

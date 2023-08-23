@@ -1,25 +1,12 @@
 import { Conversation } from '@twilio/conversations';
-import { CustomMessage } from '../types';
+import { ConversationEventMap, ConversationEventType, EventHandler } from '../types';
 import { convertMessageClass } from '../utils';
 
-const ConversationEventType = {
-  MESSAGE_ADDED: 'messageAdded',
-} as const;
-
-export interface ConversationEventMap {
-  [ConversationEventType.MESSAGE_ADDED]: (message: CustomMessage) => void;
-}
-
-type EventHandler<K extends keyof ConversationEventMap> = (
-  event: K,
-  listener: ConversationEventMap[K],
-) => void;
-
 const getCustomHandlers = (conversation: Conversation) => (type: 'add' | 'remove') => {
-  const conversationFunction = conversation[type === 'add' ? 'on' : 'removeListener'];
+  const conversationFunction = conversation[type === 'add' ? 'addListener' : 'removeListener'];
 
   const handlers: {
-    [K in keyof ConversationEventMap]?: EventHandler<K>;
+    [K in keyof ConversationEventMap]?: EventHandler<ConversationEventMap, K>;
   } = {
     [ConversationEventType.MESSAGE_ADDED]: (event, listener) =>
       conversationFunction(event, (payload) => listener(convertMessageClass(payload))),
@@ -46,5 +33,12 @@ const conversationEvent =
 
 const addConversationEventListener = conversationEvent('add');
 const removeConversationEventListener = conversationEvent('remove');
+const removeAllConversationEventListeners =
+  (conversation: Conversation) => (eventName: string) => () =>
+    conversation.removeAllListeners(eventName);
 
-export { addConversationEventListener, removeConversationEventListener };
+export {
+  addConversationEventListener,
+  removeConversationEventListener,
+  removeAllConversationEventListeners,
+};

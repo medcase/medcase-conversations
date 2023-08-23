@@ -1,14 +1,13 @@
-import { Message, Paginator } from '@twilio/conversations';
-import { CustomMessage } from '../types';
+import { Message as TwilioMessage } from '@twilio/conversations';
+import { Message, Paginator } from '../types';
 
-const convertMessageClass = (message: Message) =>
-  ({
-    body: message.body,
-    createdAt: message.dateCreated,
-    participantSid: message.participantSid,
-  }) as CustomMessage;
+const convertMessageClass = (message: TwilioMessage): Message => ({
+  body: message.body,
+  createdAt: message.dateCreated,
+  participantSid: message.participantSid,
+});
 
-const convertPaginatorMessages = (messages: Paginator<Message>) => ({
+const convertPaginatorMessages = (messages: Paginator<TwilioMessage>): Paginator<Message> => ({
   hasNextPage: messages.hasNextPage,
   hasPrevPage: messages.hasPrevPage,
   items: messages.items.map(convertMessageClass),

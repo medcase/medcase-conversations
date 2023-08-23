@@ -3,11 +3,14 @@ import {
   getMedcaseMessages,
   addClientEventListener,
   removeClientEventListener,
+  removeAllClientEventListeners,
   addConversationEventListener,
   removeConversationEventListener,
+  removeAllConversationEventListeners,
   sendMedcaseMessage,
   updateMedcaseToken,
 } from './functions';
+import { MedcaseConversation } from './types';
 
 /**
  * Initialize medcase conversation
@@ -16,7 +19,10 @@ import {
  * @param conversationSid Conversation Sid
  */
 
-const initMedcaseConversation = async (token: string, conversationSid: string) => {
+const initMedcaseConversation = async (
+  token: string,
+  conversationSid: string,
+): Promise<MedcaseConversation> => {
   const client = new Client(token);
   const conversation = await client.getConversationBySid(conversationSid);
 
@@ -55,6 +61,12 @@ const initMedcaseConversation = async (token: string, conversationSid: string) =
      */
     removeConversationEventListener: removeConversationEventListener(conversation),
     /**
+     * Removes all conversation listeners, or those of the specified `eventName`.
+     *
+     * @param eventName The name of the event.
+     */
+    removeAllConversationEventListeners: removeAllConversationEventListeners(conversation),
+    /**
      * Add client event listener
      *
      * @param eventName The name of the event.
@@ -71,12 +83,20 @@ const initMedcaseConversation = async (token: string, conversationSid: string) =
      */
     removeClientEventListener: removeClientEventListener(client),
     /**
+     * Removes all client listeners, or those of the specified `eventName`.
+     *
+     * @param eventName The name of the event.
+     */
+    removeAllClientEventListeners: removeAllClientEventListeners(client),
+    /**
      * Update the token used by the client and re-register with the Conversations services.
      *
      * @param token New access token.
      */
+
     updateToken: updateMedcaseToken(client),
   };
 };
 
-export default initMedcaseConversation;
+export { initMedcaseConversation };
+export * from './types';
