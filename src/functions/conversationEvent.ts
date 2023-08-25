@@ -1,18 +1,19 @@
-import { Conversation } from '@twilio/conversations';
-import { ConversationEventMap, ConversationEventType, EventHandler } from '../types';
+import { Conversation, Message } from '@twilio/conversations';
+import { ConversationEventMap, ConversationEventType } from '../types';
 import { convertMessageClass } from '../utils';
 
-const getCustomHandlers = (conversation: Conversation) => (type: 'add' | 'remove') => {
-  const conversationFunction = conversation[type === 'add' ? 'addListener' : 'removeListener'];
+type ConversationListenerParameters = Parameters<Conversation['addListener']>;
 
-  const handlers: {
-    [K in keyof ConversationEventMap]?: EventHandler<ConversationEventMap, K>;
-  } = {
-    [ConversationEventType.MESSAGE_ADDED]: (event, listener) =>
-      conversationFunction(event, (payload) => listener(convertMessageClass(payload))),
+type EventListener = ConversationListenerParameters[1];
+type EventType = ConversationListenerParameters[0];
+
+const getEventListener = (event, listener) => {
+  const customListeners: Partial<Record<EventType, EventListener>> = {
+    [ConversationEventType.MESSAGE_ADDED]: (payload: Message) =>
+      listener(convertMessageClass(payload)),
   };
 
-  return handlers;
+  return customListeners?.[event] || listener;
 };
 
 const conversationEvent =
@@ -23,18 +24,16 @@ const conversationEvent =
     event: K,
     listener: ConversationEventMap[K],
   ) => void) => {
-    const defaultHandler = (event, listener) =>
+    const listenerHandler = (event, listener) =>
       conversation[type === 'add' ? 'addListener' : 'removeListener'](event, listener);
 
-    const customHandlers = getCustomHandlers(conversation)(type);
-
-    return (event, listener) => (customHandlers[event] || defaultHandler)(event, listener);
+    return (event, listener) => listenerHandler(event, getEventListener(event, listener));
   };
 
 const addConversationEventListener = conversationEvent('add');
 const removeConversationEventListener = conversationEvent('remove');
 const removeAllConversationEventListeners =
-  (conversation: Conversation) => (eventName: string) => () =>
+  (conversation: Conversation) => (eventName?: string) => () =>
     conversation.removeAllListeners(eventName);
 
 export {

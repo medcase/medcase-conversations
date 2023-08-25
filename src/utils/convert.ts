@@ -1,13 +1,16 @@
 import { Message as TwilioMessage } from '@twilio/conversations';
-import { Message, Paginator } from '../types';
+import { MedcaseMessage, MedcasePaginator } from '../types';
 
-const convertMessageClass = (message: TwilioMessage): Message => ({
+const convertMessageClass = (message: TwilioMessage): MedcaseMessage => ({
+  index: message.index,
   body: message.body,
   createdAt: message.dateCreated,
-  participantSid: message.participantSid,
+  author: message.author,
 });
 
-const convertPaginatorMessages = (messages: Paginator<TwilioMessage>): Paginator<Message> => ({
+const convertPaginatorMessages = (
+  messages: MedcasePaginator<TwilioMessage>,
+): MedcasePaginator<MedcaseMessage> => ({
   hasNextPage: messages.hasNextPage,
   hasPrevPage: messages.hasPrevPage,
   items: messages.items.map(convertMessageClass),
