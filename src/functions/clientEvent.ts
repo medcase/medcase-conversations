@@ -1,18 +1,18 @@
-import { Client } from '@twilio/conversations';
+import { Client, Message } from '@twilio/conversations';
 import { convertMessageClass } from '../utils';
-import { ClientEventMap, ClientEventType, EventHandler } from '../types';
+import { ClientEventMap, ClientEventType } from '../types';
 
-const getCustomHandlers = (client: Client) => (type: 'add' | 'remove') => {
-  const clientFunction = client[type === 'add' ? 'addListener' : 'removeListener'];
+type ClientListenerParameters = Parameters<Client['addListener']>;
 
-  const handlers: {
-    [K in keyof ClientEventMap]?: EventHandler<ClientEventMap, K>;
-  } = {
-    [ClientEventType.MESSAGE_ADDED]: (event, listener) =>
-      clientFunction(event, (payload) => listener(convertMessageClass(payload))),
+type EventListener = ClientListenerParameters[1];
+type EventType = ClientListenerParameters[0];
+
+const getEventListener = (event, listener) => {
+  const customListeners: Partial<Record<EventType, EventListener>> = {
+    [ClientEventType.MESSAGE_ADDED]: (payload: Message) => listener(convertMessageClass(payload)),
   };
 
-  return handlers;
+  return customListeners?.[event] || listener;
 };
 
 const clientEvent =
@@ -20,12 +20,10 @@ const clientEvent =
   (
     client: Client,
   ): (<K extends keyof ClientEventMap>(event: K, listener: ClientEventMap[K]) => void) => {
-    const defaultHandler = (event, listener) =>
+    const listenerHandler = (event, listener) =>
       client[type === 'add' ? 'addListener' : 'removeListener'](event, listener);
 
-    const customHandlers = getCustomHandlers(client)(type);
-
-    return (event, listener) => (customHandlers[event] || defaultHandler)(event, listener);
+    return (event, listener) => listenerHandler(event, getEventListener(event, listener));
   };
 
 const addClientEventListener = clientEvent('add');
