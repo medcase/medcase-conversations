@@ -8,6 +8,9 @@
     "registry": "https://npm.pkg.github.com"
   },
   "repository": "git@github.com:medcase/medcase-conversations.git",
+  "bugs": {
+    "url": "https://github.com/medcase/medcase-conversations/issues"
+  },
   "scripts": {
     "build": "tsup",
     "lint": "eslint . --fix --max-warnings=0 ",
