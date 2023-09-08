@@ -34,7 +34,7 @@ interface Props {
   refetchToken: () => Promise<void>;
 }
 
-const useConversations = ({ token = '', conversationId = '', refetchToken }: Props) => {
+const useConversation = ({ token = '', conversationId = '', refetchToken }: Props) => {
   const [client, setClient] = useState<MedcaseClient | undefined>(undefined);
   const [conversation, setConversation] = useState<MedcaseConversation>();
   const [messages, setMessages] = useState<MedcaseMessage[] | undefined>(undefined);
@@ -193,7 +193,7 @@ const useConversations = ({ token = '', conversationId = '', refetchToken }: Pro
   };
 };
 
-export default useConversations;
+export default useConversation;
 ```
 
 ## Support
